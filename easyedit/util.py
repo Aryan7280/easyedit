@@ -31,7 +31,8 @@ def slugify(text: str) -> str:
     normalized = unicodedata.normalize("NFKD", text.lower())
     normalized = "".join(c for c in normalized if not unicodedata.combining(c))
     s = re.sub(r"[^a-z0-9]+", "-", normalized).strip("-")
-    return s[:60] or "edit-" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:12]
+    s = s[:60].strip("-")
+    return s or "edit-" + hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:12]
 
 
 def final_output(job: Path) -> Path | None:

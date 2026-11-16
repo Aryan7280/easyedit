@@ -2,6 +2,7 @@
 import unicodedata
 import unittest
 
+from easyedit import web
 from easyedit.util import slugify
 
 
@@ -28,3 +29,16 @@ class SlugifyTests(unittest.TestCase):
     def test_equivalent_non_latin_unicode_has_the_same_fallback(self):
         title = "Κυνόδοντας"
         self.assertEqual(slugify(title), slugify(unicodedata.normalize("NFD", title)))
+
+    def test_truncation_strips_trailing_hyphens_for_web_safe_job(self):
+        titles = [
+            "Everything Everywhere All at Once Special Edition Directors Cut",
+            "The Lord of the Rings The Fellowship of the Ring Extended A Journey",
+        ]
+        for title in titles:
+            with self.subTest(title=title):
+                slug = slugify(title)
+                self.assertFalse(slug.endswith("-"))
+                self.assertLessEqual(len(slug), 60)
+                self.assertIsNotNone(web.safe_job(slug))
+                self.assertRegex(slug, web._SLUG)
